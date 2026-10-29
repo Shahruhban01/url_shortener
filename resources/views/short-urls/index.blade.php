@@ -7,7 +7,7 @@
 @section('content')
 
     @if ($shortUrls->count())
-        <table border="1" cellpadding="10" width="100%">
+        <table class="data-table" cellpadding="10" width="100%">
             <thead>
                 <tr>
                     <th>Short Code</th>

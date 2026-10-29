@@ -30,3 +30,6 @@
 
 
 # php artisan make:controller TeamController
+
+
+# Using Antigravity For finishing touch, adding some colors..

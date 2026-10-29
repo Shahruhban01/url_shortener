@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class InvitationController extends Controller
@@ -89,7 +88,8 @@ class InvitationController extends Controller
                 Rule::unique('users', 'email'),
                 Rule::unique('invitations', 'email')
                     ->where('company_id', $user->company_id)
-                    ->whereNull('accepted_at'),
+                    ->whereNull('accepted_at')
+                    ->where('expires_at', '>', now()),
             ],
             'role' => ['required', Rule::in(['admin', 'member'])],
         ]);
@@ -199,7 +199,8 @@ class InvitationController extends Controller
 
         abort_unless(
             in_array($user->role, ['super_admin', 'admin'], true),
-            403     
+            403,
+            'You are not allowed to cancel invitations.'
         );
 
         $invitation = Invitation::findOrFail($id);

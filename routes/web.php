@@ -34,13 +34,13 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
         return view('invitations.create-company');
     })->name('invitations.company.create');
 
-    Route::get('/team', [TeamController::class, 'index'])
-      ->name('team.index');
+    // Route::get('/team', [TeamController::class, 'index'])
+    //   ->name('team.index');
 
-    Route::get('/invitations', [
-        InvitationController::class,
-        'index',
-    ])->name('invitations.index');
+    // Route::get('/invitations', [
+    //     InvitationController::class,
+    //     'index',
+    // ])->name('invitations.index');
 
     Route::post('/companies/invite-admin', [
         InvitationController::class,
@@ -48,6 +48,13 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
     ])->name('invitations.company.store');
 });
 
+Route::get('/team', [TeamController::class, 'index'])
+    ->middleware(['auth', 'role:super_admin,admin'])
+    ->name('team.index');
+
+Route::get('/invitations', [InvitationController::class, 'index'])
+    ->middleware(['auth', 'role:super_admin,admin'])
+    ->name('invitations.index');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin-area', function () {

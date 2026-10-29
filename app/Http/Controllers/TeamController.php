@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
-use App\Models\Invitation;
 use Illuminate\Http\Request;
 
 class TeamController extends Controller
@@ -12,6 +11,7 @@ class TeamController extends Controller
     {
         $user = $request->user();
 
+        // SuperAdmin can view all companies and their users
         if ($user->role === 'super_admin') {
             $companies = Company::with('users')
                 ->orderBy('name')
@@ -20,6 +20,7 @@ class TeamController extends Controller
             return view('team.index', compact('companies'));
         }
 
+        // Company Admin can view only their own company's team
         if ($user->role === 'admin') {
             abort_unless($user->company_id, 403);
 
@@ -29,6 +30,7 @@ class TeamController extends Controller
             return view('team.index', compact('company'));
         }
 
+        // All other roles are denied access
         abort(403, 'You are not allowed to manage the team.');
     }
 }

@@ -6,9 +6,13 @@
 
 @section('content')
 
-    <h3>All Invitations</h3>
+    <h3>
+        {{ auth()->user()->role === 'super_admin'
+            ? 'All Company Invitations'
+            : 'Your Company Invitations' }}
+    </h3>
 
-    <table border="1" cellpadding="8" width="100%">
+    <table class="data-table" cellpadding="8" width="100%">
         <thead>
             <tr>
                 <th>Email</th>
@@ -25,9 +29,10 @@
             @forelse ($invitations as $invitation)
                 <tr>
                     <td>{{ $invitation->email }}</td>
-                    <td>{{ $invitation->company->name }}</td>
+                    <td>{{ $invitation->company->name ?? 'N/A' }}</td>
                     <td>{{ $invitation->role }}</td>
-                    <td>{{ $invitation->inviter->name }}</td>
+                    <td>{{ $invitation->inviter->name ?? 'N/A' }}</td>
+
                     <td>
                         @if ($invitation->accepted_at)
                             Accepted
@@ -37,25 +42,32 @@
                             Pending
                         @endif
                     </td>
-                    <td>{{ $invitation->expires_at->format('d M Y, h:i A') }}</td>
 
                     <td>
-                    @if (!$invitation->accepted_at && !$invitation->expires_at->isPast())
-                        <form method="POST"
-                            action="{{ route('invitations.cancel', $invitation->id) }}">
-                            @csrf
-                            @method('DELETE')
+                        {{ $invitation->expires_at->format('d M Y, h:i A') }}
+                    </td>
 
-                            <button type="submit">Cancel Invitation</button>
-                        </form>
-                    @else
-                        Accepted/Expired
-                    @endif
+                    <td>
+                        @if (
+                            !$invitation->accepted_at &&
+                            !$invitation->expires_at->isPast()
+                        )
+                            <form method="POST"
+                                action="{{ route('invitations.cancel', $invitation->id) }}"
+                                onsubmit="return confirm('Cancel this invitation?')">
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="submit">Cancel Invitation</button>
+                            </form>
+                        @else
+                            {{ $invitation->accepted_at ? 'Accepted' : 'Expired' }}
+                        @endif
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">No invitations found.</td>
+                    <td colspan="7">No invitations found.</td>
                 </tr>
             @endforelse
         </tbody>
