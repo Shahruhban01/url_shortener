@@ -26,3 +26,7 @@
 # php artisan make:controller InvitationController  
 
 
+# Added public function storeCompanyMemberInvitation(Request $request) in invitation controller
+
+
+# php artisan make:controller TeamController

@@ -1,36 +1,101 @@
+
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'URL Shortener')</title>
+</head>
+<body>
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    <table width="100%" cellpadding="10">
+        <tr>
+            <td colspan="2">
+                <h2>URL Shortener</h2>
+                <hr>
+            </td>
+        </tr>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <tr>
+            <td width="220" valign="top">
+                <h3>Navigation</h3>
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+                <p><a href="{{ route('short-urls.index') }}">Dashboard / Short URLs</a></p>
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+                @if (in_array(auth()->user()->role, ['admin', 'member'], true))
+                    <p><a href="{{ route('short-urls.create') }}">Create Short URL</a></p>
+                @endif
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-    </body>
+                @if (auth()->user()->role === 'super_admin')
+                    <p>
+                        <a href="{{ route('invitations.company.create') }}">
+                            Create Company
+                        </a>
+                    </p>
+                @endif
+
+                @if (in_array(auth()->user()->role, ['super_admin', 'admin'], true))
+                    <p>
+                        <a href="{{ route('invitations.index') }}">Manage Invitations</a>
+                    </p>
+                @endif
+
+                @if (auth()->user()->role === 'admin')
+                    <p>
+                        <a href="{{ route('team.index') }}">Team Management</a>
+                    </p>
+
+                    <p>
+                        <a href="{{ route('invitations.member.create') }}">Invite Team Member</a>
+                    </p>
+                @endif
+
+
+                <p><a href="{{ route('profile.edit') }}">Profile</a></p>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit">Logout</button>
+                </form>
+            </td>
+
+            <td valign="top">
+                <h2>@yield('page-heading', 'Dashboard')</h2>
+
+                <p>
+                    Logged in as: {{ auth()->user()->name }}
+                    ({{ auth()->user()->role }})
+                </p>
+
+                <hr>
+
+                @if (session('success'))
+                    <p>{{ session('success') }}</p>
+                @endif
+
+                @if (session('error'))
+                    <p>{{ session('error') }}</p>
+                @endif
+
+                @if ($errors->any())
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+
+                @yield('content')
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <hr>
+                <p align="center">URL Shortener Application</p>
+            </td>
+        </tr>
+    </table>
+
+</body>
 </html>

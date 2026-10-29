@@ -1,52 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Company and Invite Admin</title>
-</head>
-<body>
-    <h1>Create Company and Invite Admin</h1>
 
-    @if (session('success'))
-        <p>{{ session('success') }}</p>
-    @endif
+@extends('layouts.app')
 
-    @if ($errors->any())
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    @endif
+@section('title', 'Create Company')
+@section('page-heading', 'Create Company and Invite Admin')
+
+@section('content')
+
+    <h3>New Company Details</h3>
+    <p>Create a company and invite its first administrator.</p>
 
     <form method="POST" action="{{ route('invitations.company.store') }}">
         @csrf
 
-        <div>
-            <label for="company_name">Company name</label>
-            <input
-                type="text"
-                id="company_name"
-                name="company_name"
-                value="{{ old('company_name') }}"
-                required
-                maxlength="255"
-            >
-        </div>
+        <table cellpadding="8">
+            <tr>
+                <td>
+                    <label for="company_name">Company Name:</label>
+                </td>
+                <td>
+                    <input
+                        type="text"
+                        id="company_name"
+                        name="company_name"
+                        value="{{ old('company_name') }}"
+                        size="40"
+                        maxlength="255"
+                        required
+                    >
+                </td>
+            </tr>
 
-        <div>
-            <label for="email">First Admin's email</label>
-            <input
-                type="email"
-                id="email"
-                name="email"
-                value="{{ old('email') }}"
-                required
-            >
-        </div>
+            <tr>
+                <td>
+                    <label for="email">First Admin's Email:</label>
+                </td>
+                <td>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        size="40"
+                        required
+                    >
+                </td>
+            </tr>
 
-        <button type="submit">Create Company and Invite Admin</button>
+            <tr>
+                <td></td>
+                <td>
+                    <button type="submit">
+                        Create Company and Invite Admin
+                    </button>
+                </td>
+            </tr>
+        </table>
     </form>
-</body>
-</html>
+
+    <p>
+        <a href="{{ route('short-urls.index') }}">Back to Dashboard</a>
+    </p>
+
+@endsection
