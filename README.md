@@ -151,10 +151,9 @@ ChatGPT was used during development to help troubleshoot errors, review implemen
 Used AntiGravity to identify and troubleshoot unexpected errors encountered during development.
 
 ## Notes
-
-- Do not commit `.env` or real credentials.
-- Keep `.env.example` updated when adding required environment variables.
-- Configure a real mail service before deploying the application.
+Super Admin credentials For Testing :- 
+Email: shahruhban01@gmail.com
+Password: password123
 
 ## License
 
