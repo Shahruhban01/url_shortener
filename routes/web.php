@@ -62,10 +62,18 @@ Route::get('/invitations/{token}', [
     'showAcceptanceForm',
 ])->name('invitations.accept');
 
+// Accept invitation for a new Adminn userr
+Route::post('/invitations/{token}', [
+    InvitationController::class,
+    'accept',
+])->middleware('throttle:10,1')
+  ->name('invitations.accept.store');
 
-// Url creator route for Admin and Member users
+  
+  // Url creator route for Admin and Member users
 Route::get('/short-urls/create', function () {
     return view('short-urls.create');
 })->name('short-urls.create');
+
 
 require __DIR__.'/auth.php';
