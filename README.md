@@ -150,10 +150,7 @@ The tests cover URL creation by Admins and Members, the SuperAdmin restriction, 
 ChatGPT was used during development to explain Laravel concepts, help troubleshoot errors, review implementation choices, and suggest tests and improvements. The code and final changes were reviewed during development.
 
 ## Notes
-
-- Do not commit `.env` or real credentials.
-- Keep `.env.example` updated when adding required environment variables.
-- Configure a real mail service before deploying the application.
+Super Admin credentials For Testing :- Email: shahruhban01@gmail.com Password: password123
 
 ## License
 
