@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Company;
+use App\Models\ShortUrl;
+
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -44,5 +47,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relationships
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function shortUrls()
+    {
+        return $this->hasMany(ShortUrl::class);
     }
 }
