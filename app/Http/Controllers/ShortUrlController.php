@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ShortUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class ShortUrlController extends Controller
 {
@@ -14,42 +13,33 @@ class ShortUrlController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'original_url' => [
-                'required',
-                'url',
-                'max:2048',
-            ],
+            'original_url' => 'required|url|max:2048',
         ]);
 
-        // Admin and Member accounts must belong to a company.
+        // Users must be associated with a company to create short URLs.
         if (!$user->company_id) {
             abort(403, 'Your account is not associated with a company.');
         }
 
+        // Generate a unique code for the short URL.
         do {
-            $code = Str::random(8); // will generate a random 8-character string
+            $code = Str::random(8);
         } while (ShortUrl::where('code', $code)->exists());
 
-        // $shortUrl = $user->shortUrls()->create([
-        //     'company_id' => $user->company_id,
-        //     'original_url' => $validated['original_url'],
-        //     'code' => $code,
-        // ]);
         $shortUrl = new ShortUrl([
             'original_url' => $validated['original_url'],
             'code' => $code,
         ]);
 
-        $shortUrl->company()->associate($user->company);
         $shortUrl->user()->associate($user);
+        $shortUrl->company()->associate($user->company);
         $shortUrl->save();
 
-        return back()->with(
-            'success',
-            'Short URL created: ' . route('short-urls.redirect', [
-                'code' => $shortUrl->code,
-            ])
-        );
+        $url = route('short-urls.redirect', [
+            'code' => $shortUrl->code,
+        ]);
+
+        return back()->with('success', 'Short URL created: ' . $url);
     }
 
     public function redirect(string $code)
@@ -61,28 +51,22 @@ class ShortUrlController extends Controller
         return redirect()->away($shortUrl->original_url);
     }
 
-    
-public function index(Request $request)
-{
-    $user = $request->user();
+    public function index(Request $request)
+    {
+        $user = $request->user();
 
-    if ($user->role === 'super_admin') {
-        $shortUrls = ShortUrl::with(['user', 'company'])
-            ->latest()
-            ->paginate(10);
-    } elseif ($user->role === 'admin') {
-        $shortUrls = ShortUrl::with(['user', 'company'])
-            ->where('company_id', $user->company_id)
-            ->latest()
-            ->paginate(10);
-    } else {
-        $shortUrls = ShortUrl::with(['user', 'company'])
-            ->where('user_id', $user->id)
-            ->latest()
-            ->paginate(10);
+        $shortUrls = ShortUrl::with(['user', 'company']);
+
+        if ($user->role === 'super_admin') {
+            // Super admins can view all short URLs.
+        } elseif ($user->role === 'admin') {
+            $shortUrls->where('company_id', $user->company_id);
+        } else {
+            $shortUrls->where('user_id', $user->id);
+        }
+
+        $shortUrls = $shortUrls->latest()->paginate(10);
+
+        return view('short-urls.index', compact('shortUrls'));
     }
-
-    return view('short-urls.index', compact('shortUrls'));
-}
-
 }

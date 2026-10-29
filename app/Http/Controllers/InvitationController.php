@@ -226,8 +226,10 @@ class InvitationController extends Controller
     }
 
 
-    public function index(Request $request)
-    {
+
+
+
+    public function index(Request $request) {
         $user = $request->user();
 
         $query = Invitation::with(['company', 'inviter'])
