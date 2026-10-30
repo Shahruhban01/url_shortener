@@ -164,7 +164,12 @@ The deployment allows reviewers to access and test the application through its p
 
 ChatGPT helped troubleshoot errors, review implementation choices, and suggest tests and improvements. The code and final changes were reviewed during development.
 
+<<<<<<< HEAD
 Antigravity was also used to help find and troubleshoot issues.
+=======
+## Notes
+Super Admin credentials For Testing :- Email: shahruhban01@gmail.com Password: password123
+>>>>>>> 4fbd40651819fef47ceb531c8111888a83c45f0b
 
 ## License
 
