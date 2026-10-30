@@ -95,8 +95,8 @@ After creating an invitation, check `storage/logs/laravel.log` for the invitatio
 Add the credentials for the SuperAdmin seeder to `.env`:
 
 ```env
-SUPERADMIN_EMAIL=superadmin@example.com
-SUPERADMIN_PASSWORD=change-this-password
+SUPERADMIN_EMAIL=superadmin@gmail.com
+SUPERADMIN_PASSWORD=password123
 ```
 
 The seeder creates the account using a raw SQL insert. Use a local password for development and don't commit real credentials.
@@ -145,15 +145,26 @@ php artisan test
 
 The tests cover URL creation by Admins and Members, the SuperAdmin restriction, company-level and user-level URL visibility, and public redirects with click tracking.
 
+## Deployment
+
+The application has been deployed on an AWS EC2 instance running Ubuntu 24.04 LTS to provide a live environment for testing and evaluation.
+
+**Deployment stack:**
+- AWS EC2
+- Ubuntu 24.04 LTS
+- Nginx
+- PHP 8.3
+- MySQL 8.0
+- Laravel 12
+- Gmail SMTP for invitation emails
+
+The deployment allows reviewers to access and test the application through its public IP address.
+
 ## AI Usage
 
-ChatGPT was used during development to explain Laravel concepts, help troubleshoot errors, review implementation choices, and suggest tests and improvements. The code and final changes were reviewed during development.
+ChatGPT helped troubleshoot errors, review implementation choices, and suggest tests and improvements. The code and final changes were reviewed during development.
 
-## Notes
-
-- Do not commit `.env` or real credentials.
-- Keep `.env.example` updated when adding required environment variables.
-- Configure a real mail service before deploying the application.
+Antigravity was also used to help find and troubleshoot issues.
 
 ## License
 
