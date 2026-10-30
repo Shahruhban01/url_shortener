@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Invitation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+// use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class InvitationController extends Controller
@@ -54,12 +54,12 @@ class InvitationController extends Controller
             'token' => $plainToken,
         ]);
 
-        // Local development: write the email to Laravel's configured mailer.
+        // Send the invitation email
         Mail::raw(
             "You have been invited to administer {$company->name}.\n\n"
-                . "Accept your invitation using this link:\n"
-                . $invitationUrl
-                . "\n\nThis link expires in 48 hours.",
+                ."Accept your invitation using this link:\n"
+                .$invitationUrl
+                ."\n\nThis link expires in 48 hours.",
             function ($message) use ($invitation) {
                 $message->to($invitation->email)
                     ->subject('Your company administrator invitation');
@@ -68,15 +68,14 @@ class InvitationController extends Controller
 
         return redirect()
             ->route('invitations.company.create')
-            ->with('success', 'Company created and invitation generated. Check the configured mail output.');
+            ->with('success', 'Invitation email sent successfully.');
     }
 
-    
     public function storeCompanyMemberInvitation(Request $request)
     {
         $user = $request->user();
 
-        if (!$user->company_id) {
+        if (! $user->company_id) {
             abort(403, 'Your account is not associated with a company.');
         }
 
@@ -111,10 +110,10 @@ class InvitationController extends Controller
 
         Mail::raw(
             "You have been invited to join {$user->company->name} "
-                . "as {$invitation->role}.\n\n"
-                . "Accept your invitation using this link:\n"
-                . $invitationUrl
-                . "\n\nThis link expires in 48 hours.",
+                ."as {$invitation->role}.\n\n"
+                ."Accept your invitation using this link:\n"
+                .$invitationUrl
+                ."\n\nThis link expires in 48 hours.",
             function ($message) use ($invitation) {
                 $message->to($invitation->email)
                     ->subject('Your company invitation');
@@ -123,10 +122,9 @@ class InvitationController extends Controller
 
         return back()->with(
             'success',
-            'Invitation created. Check the configured mail output.'
+            'Invitation email sent successfully.'
         );
     }
-
 
     public function showAcceptanceForm(string $token)
     {
@@ -134,11 +132,7 @@ class InvitationController extends Controller
             ->where('token_hash', hash('sha256', $token))
             ->first();
 
-        if (
-            !$invitation ||
-            $invitation->accepted_at ||
-            $invitation->expires_at->isPast()
-        ) {
+        if (! $invitation || ! $invitation->isPending()) {
             abort(404, 'This invitation is invalid, expired, or already used.');
         }
 
@@ -161,11 +155,7 @@ class InvitationController extends Controller
                 hash('sha256', $token)
             )->lockForUpdate()->first();
 
-            if (
-                !$invitation ||
-                $invitation->accepted_at ||
-                $invitation->expires_at->isPast()
-            ) {
+            if (! $invitation || ! $invitation->isPending()) {
                 abort(404, 'This invitation is invalid, expired, or already used.');
             }
 
@@ -178,7 +168,9 @@ class InvitationController extends Controller
             User::create([
                 'name' => $validated['name'],
                 'email' => $invitation->email,
-                'password' => Hash::make($validated['password']),
+                'email_verified_at' => now(),
+                // 'password' => Hash::make($validated['password']),
+                'password' => $validated['password'],
                 'company_id' => $invitation->company_id,
                 'role' => $invitation->role,
             ]);
@@ -192,7 +184,6 @@ class InvitationController extends Controller
             ->with('status', 'Invitation accepted. You can now log in.');
     }
 
-    
     public function cancel(Request $request, int $id)
     {
         $user = $request->user();
@@ -213,7 +204,7 @@ class InvitationController extends Controller
             );
         }
 
-        if ($invitation->accepted_at || $invitation->expires_at->isPast()) {
+        if (! $invitation->isPending()) {
             return back()->with(
                 'error',
                 'Only pending invitations can be cancelled.'
@@ -224,7 +215,6 @@ class InvitationController extends Controller
 
         return back()->with('success', 'Invitation cancelled successfully.');
     }
-
 
     public function index(Request $request)
     {

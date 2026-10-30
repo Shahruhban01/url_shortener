@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\Company;
-use App\Models\ShortUrl;
-
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -52,13 +52,18 @@ class User extends Authenticatable
     }
 
     // Relationships
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
 
-    public function shortUrls()
+    public function shortUrls(): HasMany
     {
         return $this->hasMany(ShortUrl::class);
+    }
+
+    public function invitationsSent(): HasMany
+    {
+        return $this->hasMany(Invitation::class, 'invited_by');
     }
 }

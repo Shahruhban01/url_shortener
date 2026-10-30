@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ShortUrlController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShortUrlController;
 use App\Http\Controllers\TeamController;
+use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -24,8 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/short-urls', [ShortUrlController::class, 'index'])
-    ->middleware('role:super_admin,admin,member')
-    ->name('short-urls.index');
+        ->middleware('role:super_admin,admin,member')
+        ->name('short-urls.index');
 });
 
 // Role-based access control routes
@@ -71,7 +71,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     ])->name('invitations.member.store');
 });
 
-    
 // Route::middleware(['auth', 'role:member'])
 //     ->get('/member-area', function () {
 //         return 'Member access granted';
@@ -92,7 +91,6 @@ Route::middleware(['auth', 'role:admin,member'])->group(function () {
         ->name('short-urls.store');
 });
 
-
 // Send invitation to a new Admin iser
 Route::get('/invitations/{token}', [
     InvitationController::class,
@@ -111,7 +109,6 @@ Route::post('/invitations/{token}', [
     InvitationController::class,
     'accept',
 ])->middleware('throttle:10,1')
-  ->name('invitations.accept.store');
-
+    ->name('invitations.accept.store');
 
 require __DIR__.'/auth.php';
