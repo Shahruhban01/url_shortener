@@ -1,0 +1,55 @@
+
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            cd /var/www/url-shortener
+
+            echo "Creating database backup..."
+            mkdir -p /home/ubuntu/db-backups
+
+            BACKUP="/home/ubuntu/db-backups/backup_$(date +%F_%H-%M-%S).sql"
+
+            mysqldump --no-tablespaces --single-transaction --routines --triggers url_shortener > "${BACKUP}.tmp"
+            test -s "${BACKUP}.tmp"
+            mv "${BACKUP}.tmp" "$BACKUP"
+
+            echo "Pulling latest changes..."
+            git pull origin main
+
+            echo "Installing dependencies..."
+            composer install --no-dev --optimize-autoloader
+            npm ci
+            npm run build
+
+            echo "Running migrations..."
+            php artisan migrate --force
+
+            echo "Clearing Laravel caches..."
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            echo "Reloading services..."
+            sudo systemctl reload php8.3-fpm
+            sudo systemctl reload nginx
+
+            echo "Deployment completed successfully."
