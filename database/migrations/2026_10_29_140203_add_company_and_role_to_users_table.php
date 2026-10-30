@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-        $table->foreignId('company_id')
-        ->nullable()
-        ->constrained('companies')
-        ->restrictOnDelete();
+            $table->foreignId('company_id')
+                ->nullable()
+                ->constrained('companies')
+                ->restrictOnDelete();
 
-    $table->string('role')->default('member')->index();
-});
+            $table->string('role')->default('member')->index();
+        });
     }
 
     /**
@@ -27,8 +27,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-        $table->dropForeign(['company_id']);
-        $table->dropColumn(['company_id', 'role']);
-});
+            $table->dropForeign(['company_id']);
+            $table->dropColumn(['company_id', 'role']);
+        });
     }
 };

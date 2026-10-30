@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ShortUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class ShortUrlController extends Controller
 {
@@ -22,7 +21,7 @@ class ShortUrlController extends Controller
         ]);
 
         // Admin and Member accounts must belong to a company.
-        if (!$user->company_id) {
+        if (! $user->company_id) {
             abort(403, 'Your account is not associated with a company.');
         }
 
@@ -46,7 +45,7 @@ class ShortUrlController extends Controller
 
         return back()->with(
             'success',
-            'Short URL created: ' . route('short-urls.redirect', [
+            'Short URL created: '.route('short-urls.redirect', [
                 'code' => $shortUrl->code,
             ])
         );
@@ -61,28 +60,26 @@ class ShortUrlController extends Controller
         return redirect()->away($shortUrl->original_url);
     }
 
-    
-public function index(Request $request)
-{
-    $user = $request->user();
+    public function index(Request $request)
+    {
+        $user = $request->user();
 
-    if ($user->role === 'super_admin') {
-        $shortUrls = ShortUrl::with(['user', 'company'])
-            ->latest()
-            ->paginate(10);
-    } elseif ($user->role === 'admin') {
-        $shortUrls = ShortUrl::with(['user', 'company'])
-            ->where('company_id', $user->company_id)
-            ->latest()
-            ->paginate(10);
-    } else {
-        $shortUrls = ShortUrl::with(['user', 'company'])
-            ->where('user_id', $user->id)
-            ->latest()
-            ->paginate(10);
+        if ($user->role === 'super_admin') {
+            $shortUrls = ShortUrl::with(['user', 'company'])
+                ->latest()
+                ->paginate(10);
+        } elseif ($user->role === 'admin') {
+            $shortUrls = ShortUrl::with(['user', 'company'])
+                ->where('company_id', $user->company_id)
+                ->latest()
+                ->paginate(10);
+        } else {
+            $shortUrls = ShortUrl::with(['user', 'company'])
+                ->where('user_id', $user->id)
+                ->latest()
+                ->paginate(10);
+        }
+
+        return view('short-urls.index', compact('shortUrls'));
     }
-
-    return view('short-urls.index', compact('shortUrls'));
-}
-
 }

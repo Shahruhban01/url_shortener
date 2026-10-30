@@ -58,7 +58,7 @@
                                 @csrf
                                 @method('DELETE')
 
-                                <button type="submit">Cancel Invitation</button>
+                                <button type="submit">Revoke Invitation</button>
                             </form>
                         @else
                             {{ $invitation->accepted_at ? 'Accepted' : 'Expired' }}
